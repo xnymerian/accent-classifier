@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import yt_dlp
 import os
+import tempfile
 from detect import SimpleOfflineAccentClassifier
 
 app = Flask(__name__)
@@ -15,9 +16,9 @@ def analyze():
     try:
         video_url = request.form['url']
         
-        # Geçici dosya yolu
-        temp_dir = os.environ.get('TEMP_DIR', '/tmp')
-        temp_audio_path = os.path.join(temp_dir, 'temp_audio.wav')
+        # Geçici dosya oluştur
+        with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
+            temp_audio_path = temp_file.name
         
         # YouTube'dan ses indir
         ydl_opts = {
@@ -53,8 +54,10 @@ def analyze():
         result = classifier.predict_accent(temp_audio_path)
         
         # Geçici dosyayı temizle
-        if os.path.exists(temp_audio_path):
+        try:
             os.remove(temp_audio_path)
+        except:
+            pass
         
         if result is None:
             return jsonify({'error': 'Voice analysis failed. Please try a different video.'})
