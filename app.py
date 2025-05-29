@@ -27,7 +27,7 @@ def analyze():
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'wav',
             }],
-            'outtmpl': temp_audio_path.replace('.wav', ''),  # .wav uzantısını kaldır
+            'outtmpl': temp_audio_path.replace('.wav', ''),
             'quiet': True,
             'no_warnings': True,
             'extract_flat': True,
@@ -36,6 +36,18 @@ def analyze():
             'no_check_certificate': True,
             'prefer_insecure': True,
             'http_headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'en-us,en;q=0.5',
+                'Sec-Fetch-Mode': 'navigate',
+            },
+            'cookiesfrombrowser': ('chrome',),  # Tarayıcı çerezlerini kullan
+            'extract_flat': 'in_playlist',  # Playlist içindeyse sadece ilk videoyu al
+            'noplaylist': True,  # Playlist değil
+            'ignoreerrors': True,  # Hataları görmezden gel
+            'no_check_certificate': True,  # Sertifika kontrolünü atla
+            'prefer_insecure': True,  # Güvenli olmayan bağlantıları tercih et
+            'http_headers': {  # Tarayıcı gibi görün
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                 'Accept-Language': 'en-us,en;q=0.5',
