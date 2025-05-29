@@ -15,6 +15,10 @@ def analyze():
     try:
         video_url = request.form['url']
         
+        # Geçici dosya yolu
+        temp_dir = os.environ.get('TEMP_DIR', '/tmp')
+        temp_audio_path = os.path.join(temp_dir, 'temp_audio.wav')
+        
         # YouTube'dan ses indir
         ydl_opts = {
             'format': 'bestaudio/best',
@@ -22,7 +26,7 @@ def analyze():
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'wav',
             }],
-            'outtmpl': 'temp_audio',
+            'outtmpl': temp_audio_path.replace('.wav', ''),  # .wav uzantısını kaldır
             'quiet': True,
             'no_warnings': True,
             'extract_flat': True,
@@ -42,15 +46,15 @@ def analyze():
             ydl.download([video_url])
         
         # Ses dosyasının varlığını kontrol et
-        if not os.path.exists('temp_audio.wav'):
-            return jsonify({'error': 'Audio file could not be downloaded.'})
+        if not os.path.exists(temp_audio_path):
+            return jsonify({'error': 'Audio file could not be downloaded. Please try a different video.'})
         
         # Ses dosyasını analiz et
-        result = classifier.predict_accent('temp_audio.wav')
+        result = classifier.predict_accent(temp_audio_path)
         
         # Geçici dosyayı temizle
-        if os.path.exists('temp_audio.wav'):
-            os.remove('temp_audio.wav')
+        if os.path.exists(temp_audio_path):
+            os.remove(temp_audio_path)
         
         if result is None:
             return jsonify({'error': 'Voice analysis failed. Please try a different video.'})
