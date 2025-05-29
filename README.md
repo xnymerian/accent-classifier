@@ -26,6 +26,9 @@ python app.py
 ```
 Then open: http://localhost:5000
 
+ERROR!
+Some functions are not working due to temporary permission issues in the YouTube bot or deployment environment. It will work without any problems locally.
+
 Features:
 - Upload audio files
 - Paste YouTube URLs
