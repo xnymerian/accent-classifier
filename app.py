@@ -1,11 +1,14 @@
 from flask import Flask, render_template, request, jsonify
 import yt_dlp
 import os
-import tempfile
 from detect import SimpleOfflineAccentClassifier
 
 app = Flask(__name__)
 classifier = SimpleOfflineAccentClassifier()
+
+# Geçici dosya dizini
+TEMP_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'temp')
+os.makedirs(TEMP_DIR, exist_ok=True)
 
 @app.route('/')
 def home():
@@ -16,9 +19,8 @@ def analyze():
     try:
         video_url = request.form['url']
         
-        # Geçici dosya oluştur
-        temp_dir = tempfile.gettempdir()  # Sistemin geçici dizinini al
-        temp_audio_path = os.path.join(temp_dir, 'temp_audio.wav')
+        # Geçici dosya yolu
+        temp_audio_path = os.path.join(TEMP_DIR, 'temp_audio.wav')
         
         # YouTube'dan ses indir
         ydl_opts = {
@@ -27,7 +29,7 @@ def analyze():
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'wav',
             }],
-            'outtmpl': temp_audio_path.replace('.wav', ''),  # .wav uzantısını kaldır
+            'outtmpl': temp_audio_path.replace('.wav', ''),
             'quiet': True,
             'no_warnings': True,
             'extract_flat': True,
@@ -65,7 +67,6 @@ def analyze():
         return jsonify(result)
         
     except Exception as e:
-        # Hata detayını logla
         print(f"Error: {str(e)}")
         return jsonify({'error': f'An error occurred: {str(e)}'})
 
