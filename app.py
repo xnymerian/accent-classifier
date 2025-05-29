@@ -17,8 +17,8 @@ def analyze():
         video_url = request.form['url']
         
         # Geçici dosya oluştur
-        with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
-            temp_audio_path = temp_file.name
+        temp_dir = tempfile.gettempdir()  # Sistemin geçici dizinini al
+        temp_audio_path = os.path.join(temp_dir, 'temp_audio.wav')
         
         # YouTube'dan ses indir
         ydl_opts = {
@@ -27,7 +27,7 @@ def analyze():
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'wav',
             }],
-            'outtmpl': temp_audio_path.replace('.wav', ''),
+            'outtmpl': temp_audio_path.replace('.wav', ''),  # .wav uzantısını kaldır
             'quiet': True,
             'no_warnings': True,
             'extract_flat': True,
@@ -36,18 +36,6 @@ def analyze():
             'no_check_certificate': True,
             'prefer_insecure': True,
             'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language': 'en-us,en;q=0.5',
-                'Sec-Fetch-Mode': 'navigate',
-            },
-            'cookiesfrombrowser': ('chrome',),  # Tarayıcı çerezlerini kullan
-            'extract_flat': 'in_playlist',  # Playlist içindeyse sadece ilk videoyu al
-            'noplaylist': True,  # Playlist değil
-            'ignoreerrors': True,  # Hataları görmezden gel
-            'no_check_certificate': True,  # Sertifika kontrolünü atla
-            'prefer_insecure': True,  # Güvenli olmayan bağlantıları tercih et
-            'http_headers': {  # Tarayıcı gibi görün
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                 'Accept-Language': 'en-us,en;q=0.5',
@@ -83,4 +71,4 @@ def analyze():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 7860))
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port)
