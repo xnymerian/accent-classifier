@@ -25,12 +25,12 @@ def analyze():
             'outtmpl': 'temp_audio',
             'quiet': True,
             'no_warnings': True,
-            'extract_flat': True, 
-            'noplaylist': True,    
-            'ignoreerrors': True,  
-            'no_check_certificate': True,  
-            'prefer_insecure': True,  
-            'http_headers': {  
+            'extract_flat': True,
+            'noplaylist': True,
+            'ignoreerrors': True,
+            'no_check_certificate': True,
+            'prefer_insecure': True,
+            'http_headers': {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                 'Accept-Language': 'en-us,en;q=0.5',
@@ -41,6 +41,10 @@ def analyze():
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([video_url])
         
+        # Ses dosyasının varlığını kontrol et
+        if not os.path.exists('temp_audio.wav'):
+            return jsonify({'error': 'Audio file could not be downloaded.'})
+        
         # Ses dosyasını analiz et
         result = classifier.predict_accent('temp_audio.wav')
         
@@ -49,12 +53,14 @@ def analyze():
             os.remove('temp_audio.wav')
         
         if result is None:
-            return jsonify({'error': 'voice analyze failed.'})
+            return jsonify({'error': 'Voice analysis failed. Please try a different video.'})
         
         return jsonify(result)
         
     except Exception as e:
-        return jsonify({'error': str(e)})
+        # Hata detayını logla
+        print(f"Error: {str(e)}")
+        return jsonify({'error': f'An error occurred: {str(e)}'})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 7860))
